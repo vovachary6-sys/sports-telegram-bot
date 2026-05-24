@@ -10,6 +10,7 @@ from config import TOKEN
 from handlers.start_handler import start
 from handlers.match_type_handler import match_type_handler
 from handlers.team_handler import team_handler
+from handlers.world_cup_handler import world_cup_handler
 
 
 def main():
@@ -25,6 +26,12 @@ def main():
     app.add_handler(
         CommandHandler("team", team_handler)
     )
+    app.add_handler(
+    MessageHandler(
+        filters.Regex("^🌍 World Cup 2026$"),
+        world_cup_handler
+    )
+)
 
     app.add_handler(
         MessageHandler(
