@@ -17,6 +17,9 @@ LEAGUES = {
     "Saudi Pro League": "soccer/ksa.1",
     "UEFA Champions League": "soccer/uefa.champions",
     "UEFA Europa League": "soccer/uefa.europa",
+
+    "🌍 World Cup 2026": "soccer/fifa.world",
+    
     "NBA": "basketball/nba",
     "NHL": "hockey/nhl"
 }
