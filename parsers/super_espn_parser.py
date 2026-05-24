@@ -1,3 +1,4 @@
+```python
 import requests
 from datetime import datetime, timedelta, timezone
 from collections import defaultdict
@@ -19,35 +20,37 @@ LEAGUES = {
     "UEFA Europa League": "soccer/uefa.europa",
 
     "🌍 World Cup 2026": "soccer/fifa.world",
-    
+
     "NBA": "basketball/nba",
     "NHL": "hockey/nhl"
 }
 
-CACHE = {}
-CACHE_LIFETIME = 60
-
 
 def get_cached(url):
 
-    now = time.time()
-
-    if url in CACHE:
-
-        data, timestamp = CACHE[url]
-
-        if now - timestamp < CACHE_LIFETIME:
-            return data
-
     try:
 
-        r = requests.get(url, timeout=30)
+        url = f"{url}&_t={int(time.time())}"
 
-        data = r.json()
+        r = requests.get(
 
-        CACHE[url] = (data, now)
+            url,
 
-        return data
+            headers={
+
+                "Cache-Control": "no-cache",
+
+                "Pragma": "no-cache",
+
+                "Expires": "0"
+
+            },
+
+            timeout=15
+
+        )
+
+        return r.json()
 
     except:
 
@@ -160,7 +163,7 @@ def get_goal_scorers(event, league):
         if not data:
             return ""
 
-        scoring_plays = data.get("scoringPlays", [])
+        scoring_plays = data.get("scoringPlays") or []
 
         goals = []
 
@@ -195,7 +198,7 @@ def add_match_link(event, text):
 
                 href = link.get("href", "")
 
-                if "espn.com" in href:
+                if href.startswith("https://www.espn.com"):
 
                     text += f"📺 {href}\n"
 
@@ -298,7 +301,7 @@ def parse_live(events, sport, league):
 
         state = e["status"]["type"]["state"]
 
-        if state not in ["in", "live"]:
+        if state not in ["in", "live", "halftime"]:
             continue
 
         comp = e["competitions"][0]
@@ -476,3 +479,4 @@ def get_matches(league, mode):
         return parse_upcoming(events)
 
     return "Ошибка"
+```
