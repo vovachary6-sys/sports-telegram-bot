@@ -478,4 +478,3 @@ def get_matches(league, mode):
         return parse_upcoming(events)
 
     return "Ошибка"
-```
