@@ -17,7 +17,7 @@ def get_main_keyboard():
         ["Saudi Pro League"],
 
         ["UEFA Champions League", "UEFA Europa League"],
-        ["🌍World Cup 2026"]
+        ["🌍 World Cup 2026"]
 
     ]
 
