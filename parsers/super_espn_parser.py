@@ -1,4 +1,3 @@
-```python
 import requests
 from datetime import datetime, timedelta, timezone
 from collections import defaultdict
