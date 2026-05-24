@@ -1,3 +1,4 @@
+```python
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -27,16 +28,15 @@ def main():
     )
 
     app.add_handler(
-    MessageHandler(
-        filters.TEXT
-        & ~filters.COMMAND
-        & ~filters.Regex("^🌍 World Cup 2026$"),
-        match_type_handler
+        MessageHandler(
+            filters.TEXT & ~filters.COMMAND,
+            match_type_handler
+        )
     )
-)
 
     app.run_polling()
 
 
 if __name__ == "__main__":
     main()
+```
