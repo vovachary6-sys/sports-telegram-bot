@@ -1,11 +1,17 @@
 from telegram import Update
+from telegram.ext import ContextTypes
 
-from keyboards.leagues_keyboard import get_leagues_keyboard
+from keyboards.main_keyboard import (
+    get_main_keyboard
+)
 
 
-async def start(update: Update, context):
+async def start(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
 
     await update.message.reply_text(
-        "Выбери лигу:",
-        reply_markup=get_leagues_keyboard()
+        "🏆 Sports Bot",
+        reply_markup=get_main_keyboard()
     )
