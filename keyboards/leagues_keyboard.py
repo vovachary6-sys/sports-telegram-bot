@@ -5,16 +5,20 @@ def get_leagues_keyboard():
 
     keyboard = [
 
-        ["Premier League", "La Liga"],
-        ["Bundesliga", "Serie A"],
-        ["Ligue 1", "Championship"],
+        ["NBA", "NHL"],
+
+        ["Premier League", "Championship"],
+
+        ["La Liga", "Bundesliga"],
+
+        ["Serie A", "Ligue 1"],
 
         ["Eredivisie", "Liga Portugal"],
+
         ["Saudi Pro League"],
 
         ["UEFA Champions League", "UEFA Europa League"],
 
-        ["NBA", "NHL"]
         ["🌍 World Cup 2026"]
 
     ]
