@@ -28,17 +28,19 @@ def main():
     )
     app.add_handler(
     MessageHandler(
-        filters.Regex("^World Cup 2026$"),
+        filters.Regex("^🌍 World Cup 2026$"),
         world_cup_handler
     )
 )
 
     app.add_handler(
-        MessageHandler(
-            filters.TEXT & ~filters.COMMAND,
-            match_type_handler
-        )
+    MessageHandler(
+        filters.TEXT
+        & ~filters.COMMAND
+        & ~filters.Regex("^🌍 World Cup 2026$"),
+        match_type_handler
     )
+)
 
     app.run_polling()
 
