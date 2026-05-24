@@ -28,7 +28,7 @@ def main():
     )
     app.add_handler(
     MessageHandler(
-        filters.Regex("^🌍 World Cup 2026$"),
+        filters.Regex("^World Cup 2026$"),
         world_cup_handler
     )
 )
