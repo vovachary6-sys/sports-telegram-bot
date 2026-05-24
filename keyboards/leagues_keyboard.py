@@ -15,6 +15,7 @@ def get_leagues_keyboard():
         ["UEFA Champions League", "UEFA Europa League"],
 
         ["NBA", "NHL"]
+        ["🌍 World Cup 2026"]
 
     ]
 
