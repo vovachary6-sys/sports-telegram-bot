@@ -8,6 +8,18 @@ from keyboards.match_type_keyboard import get_match_type_keyboard
 from handlers.league_handler import user_league
 
 
+MAX_MESSAGE_LENGTH = 4000
+
+
+async def send_long_message(message, text):
+
+    for i in range(0, len(text), MAX_MESSAGE_LENGTH):
+
+        chunk = text[i:i + MAX_MESSAGE_LENGTH]
+
+        await message.reply_text(chunk)
+
+
 async def match_type_handler(update: Update, context):
 
     user_id = update.message.from_user.id
@@ -47,17 +59,23 @@ async def match_type_handler(update: Update, context):
     if text == "Завершенные":
 
         result = get_matches(league, "finished")
-        await update.message.reply_text(result)
+
+        await send_long_message(update.message, result)
+
         return
 
     if text == "Предстоящие":
 
         result = get_matches(league, "upcoming")
-        await update.message.reply_text(result)
+
+        await send_long_message(update.message, result)
+
         return
 
     if text == "Live":
 
         result = get_matches(league, "live")
-        await update.message.reply_text(result)
+
+        await send_long_message(update.message, result)
+
         return
