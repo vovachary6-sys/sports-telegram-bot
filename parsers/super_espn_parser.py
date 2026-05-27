@@ -426,7 +426,7 @@ def get_matches(league, mode):
         return parse_live(events, sport)
 
     return "Ошибка"
-    def get_tour_matches(league, tour_number):
+def get_tour_matches(league, tour_number):
 
     events, sport = load_events(league)
 
