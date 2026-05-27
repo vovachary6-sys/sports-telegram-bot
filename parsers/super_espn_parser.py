@@ -348,11 +348,18 @@ def parse_live(events, sport, league):
     return text
 
 
-def parse_upcoming(events):
+def parse_upcoming(events, league):
 
     now = datetime.now(timezone.utc)
 
-    limit = now + timedelta(days=7)
+    # ДЛЯ ЧМ НЕ ОГРАНИЧИВАЕМ 7 ДНЯМИ
+    if league == "🌍 World Cup 2026":
+
+        limit = now + timedelta(days=365)
+
+    else:
+
+        limit = now + timedelta(days=7)
 
     matches = []
 
@@ -396,7 +403,6 @@ def parse_upcoming(events):
         return "В ближайшие дни матчей нет"
 
     return group_matches(matches)
-
 
 def search_team(team_name):
 
@@ -484,6 +490,6 @@ def get_matches(league, mode):
         return parse_live(events, sport, league)
 
     if mode == "upcoming":
-        return parse_upcoming(events)
+        return parse_upcoming(events, league)
 
     return "Ошибка"
