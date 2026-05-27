@@ -10,6 +10,17 @@ from config import TOKEN
 from handlers.start_handler import start
 from handlers.match_type_handler import match_type_handler
 from handlers.team_handler import team_handler
+from handlers.tour_handler import handle_tour_input
+
+
+async def handle_all_messages(update, context):
+
+    handled = await handle_tour_input(update, context)
+
+    if handled:
+        return
+
+    await match_type_handler(update, context)
 
 
 def main():
@@ -29,7 +40,7 @@ def main():
     app.add_handler(
         MessageHandler(
             filters.TEXT & ~filters.COMMAND,
-            match_type_handler
+            handle_all_messages
         )
     )
 
