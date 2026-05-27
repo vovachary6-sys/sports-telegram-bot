@@ -95,15 +95,24 @@ def load_events(league):
 
     now = datetime.utcnow()
 
-    if sport in ["basketball", "hockey"]:
+    # СПЕЦИАЛЬНО ДЛЯ ЧЕМПИОНАТА МИРА
+    if league == "🌍 World Cup 2026":
 
-        start = (now - timedelta(days=3)).strftime("%Y%m%d")
-        end = (now + timedelta(days=3)).strftime("%Y%m%d")
+        # Весь турнир
+        start = "20260601"
+        end = "20260731"
 
     else:
 
-        start = (now - timedelta(days=7)).strftime("%Y%m%d")
-        end = (now + timedelta(days=7)).strftime("%Y%m%d")
+        if sport in ["basketball", "hockey"]:
+
+            start = (now - timedelta(days=3)).strftime("%Y%m%d")
+            end = (now + timedelta(days=3)).strftime("%Y%m%d")
+
+        else:
+
+            start = (now - timedelta(days=7)).strftime("%Y%m%d")
+            end = (now + timedelta(days=7)).strftime("%Y%m%d")
 
     url = f"{BASE_URL}/{path}/scoreboard?dates={start}-{end}&limit=1000"
 
