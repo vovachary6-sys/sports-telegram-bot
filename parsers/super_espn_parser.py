@@ -95,24 +95,15 @@ def load_events(league):
 
     now = datetime.utcnow()
 
-    # СПЕЦИАЛЬНО ДЛЯ ЧЕМПИОНАТА МИРА
     if league == "🌍 World Cup 2026":
 
-        # Весь турнир
         start = "20260601"
         end = "20260731"
 
     else:
 
-        if sport in ["basketball", "hockey"]:
-
-            start = (now - timedelta(days=3)).strftime("%Y%m%d")
-            end = (now + timedelta(days=3)).strftime("%Y%m%d")
-
-        else:
-
-            start = (now - timedelta(days=7)).strftime("%Y%m%d")
-            end = (now + timedelta(days=7)).strftime("%Y%m%d")
+        start = (now - timedelta(days=30)).strftime("%Y%m%d")
+        end = (now + timedelta(days=30)).strftime("%Y%m%d")
 
     url = f"{BASE_URL}/{path}/scoreboard?dates={start}-{end}&limit=1000"
 
@@ -144,54 +135,6 @@ def get_stadium(event):
 
     except:
         return "Стадион неизвестен"
-
-
-def get_goal_scorers(event, league):
-
-    text = ""
-
-    try:
-
-        event_id = event.get("id")
-
-        if not event_id:
-            return ""
-
-        path = LEAGUES.get(league)
-
-        if not path:
-            return ""
-
-        url = (
-            f"{BASE_URL}/{path}/summary?event={event_id}"
-        )
-
-        data = get_cached(url)
-
-        if not data:
-            return ""
-
-        scoring_plays = data.get("scoringPlays") or []
-
-        goals = []
-
-        for play in scoring_plays:
-
-            text_play = play.get("text", "")
-
-            if text_play:
-
-                goals.append(f"⚽ {text_play}")
-
-        if goals:
-
-            text = "\n".join(goals) + "\n"
-
-    except:
-
-        pass
-
-    return text
 
 
 def add_match_link(event, text):
@@ -242,23 +185,18 @@ def group_matches(matches):
     return result
 
 
-def parse_finished(events, league):
-
-    now = datetime.now(timezone.utc)
-
-    limit = now - timedelta(days=7)
+def parse_recent(events):
 
     matches = []
 
     for e in events:
 
-        if e["status"]["type"]["state"] != "post":
+        state = e["status"]["type"]["state"]
+
+        if state not in ["post", "pre"]:
             continue
 
         dt, utc, msk = convert_time(e["date"])
-
-        if dt < limit:
-            continue
 
         comp = e["competitions"][0]
 
@@ -267,20 +205,28 @@ def parse_finished(events, league):
         team1 = teams[0]["team"]["displayName"]
         team2 = teams[1]["team"]["displayName"]
 
-        score1 = teams[0]["score"]
-        score2 = teams[1]["score"]
-
         stadium = get_stadium(e)
 
         date_label = dt.strftime("%d.%m.%Y")
 
-        text = (
-            f"{team1} {score1}:{score2} {team2}\n"
-            f"🏟 {stadium}\n"
-            f"{utc} UTC | {msk} МСК\n"
-        )
+        if state == "post":
 
-        text += get_goal_scorers(e, league)
+            score1 = teams[0]["score"]
+            score2 = teams[1]["score"]
+
+            text = (
+                f"{team1} {score1}:{score2} {team2}\n"
+                f"🏟 {stadium}\n"
+                f"{utc} UTC | {msk} МСК\n"
+            )
+
+        else:
+
+            text = (
+                f"{team1} vs {team2}\n"
+                f"🏟 {stadium}\n"
+                f"{utc} UTC | {msk} МСК\n"
+            )
 
         text = add_match_link(e, text)
 
@@ -292,12 +238,12 @@ def parse_finished(events, league):
         })
 
     if not matches:
-        return "В ближайшие дни матчей нет"
+        return "Матчи не найдены."
 
     return group_matches(matches)
 
 
-def parse_live(events, sport, league):
+def parse_live(events, sport):
 
     word = period_name(sport)
 
@@ -333,8 +279,6 @@ def parse_live(events, sport, league):
             f"{clock} | {period} {word}\n"
         )
 
-        text += get_goal_scorers(e, league)
-
         text = add_match_link(e, text)
 
         text += "\n"
@@ -348,29 +292,20 @@ def parse_live(events, sport, league):
     return text
 
 
-def parse_upcoming(events, league):
+def get_tour_matches(league, tour):
 
-    now = datetime.now(timezone.utc)
-
-    # ДЛЯ ЧМ НЕ ОГРАНИЧИВАЕМ 7 ДНЯМИ
-    if league == "🌍 World Cup 2026":
-
-        limit = now + timedelta(days=365)
-
-    else:
-
-        limit = now + timedelta(days=7)
+    events, sport = load_events(league)
 
     matches = []
 
     for e in events:
 
-        if e["status"]["type"]["state"] != "pre":
-            continue
+        week = (
+            e.get("week", {})
+            .get("number", 0)
+        )
 
-        dt, utc, msk = convert_time(e["date"])
-
-        if dt > limit:
+        if week != tour:
             continue
 
         comp = e["competitions"][0]
@@ -379,6 +314,8 @@ def parse_upcoming(events, league):
 
         team1 = teams[0]["team"]["displayName"]
         team2 = teams[1]["team"]["displayName"]
+
+        dt, utc, msk = convert_time(e["date"])
 
         stadium = get_stadium(e)
 
@@ -400,9 +337,10 @@ def parse_upcoming(events, league):
         })
 
     if not matches:
-        return "В ближайшие дни матчей нет"
+        return "Матчи тура не найдены."
 
     return group_matches(matches)
+
 
 def search_team(team_name):
 
@@ -458,8 +396,6 @@ def search_team(team_name):
                 f"{utc} UTC | {msk} МСК\n"
             )
 
-            text += get_goal_scorers(e, league)
-
             text = add_match_link(e, text)
 
             text += "\n"
@@ -481,15 +417,86 @@ def get_matches(league, mode):
     events, sport = load_events(league)
 
     if not events:
-        return "В ближайшие дни матчей нет"
+        return "Матчи не найдены."
 
-    if mode == "finished":
-        return parse_finished(events, league)
+    if mode == "recent":
+        return parse_recent(events)
 
     if mode == "live":
-        return parse_live(events, sport, league)
-
-    if mode == "upcoming":
-        return parse_upcoming(events, league)
+        return parse_live(events, sport)
 
     return "Ошибка"
+    def get_tour_matches(league, tour_number):
+
+    events, sport = load_events(league)
+
+    if not events:
+        return "Матчи не найдены"
+
+    matches = []
+
+    for e in events:
+
+        try:
+
+            season_type = (
+                e["season"]["type"]
+            )
+
+            if season_type != tour_number:
+                continue
+
+        except:
+            continue
+
+        comp = e["competitions"][0]
+
+        teams = comp["competitors"]
+
+        team1 = teams[0]["team"]["displayName"]
+        team2 = teams[1]["team"]["displayName"]
+
+        status = e["status"]["type"]["state"]
+
+        dt, utc, msk = convert_time(e["date"])
+
+        date_label = dt.strftime("%d.%m.%Y")
+
+        stadium = get_stadium(e)
+
+        if status == "post":
+
+            score = (
+                f"{teams[0]['score']}:{teams[1]['score']}"
+            )
+
+        elif status in ["in", "live"]:
+
+            score = (
+                f"LIVE "
+                f"{teams[0]['score']}:{teams[1]['score']}"
+            )
+
+        else:
+
+            score = "vs"
+
+        text = (
+            f"{team1} {score} {team2}\n"
+            f"🏟 {stadium}\n"
+            f"{utc} UTC | {msk} МСК\n"
+        )
+
+        text = add_match_link(e, text)
+
+        text += "\n"
+
+        matches.append({
+            "date": date_label,
+            "text": text
+        })
+
+    if not matches:
+        return "Матчи тура не найдены."
+
+    return group_matches(matches)
