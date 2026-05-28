@@ -1,15 +1,23 @@
 from telegram import Update
 
-from parsers.super_espn_parser import (
-    get_matches,
-    LEAGUES
-)
+from parsers.super_espn_parser import get_matches, LEAGUES
 
 from keyboards.main_keyboard import get_main_keyboard
 from keyboards.match_type_keyboard import get_match_type_keyboard
 
 from handlers.league_handler import user_league
-from handlers.tour_handler import waiting_for_tour
+
+
+MAX_MESSAGE_LENGTH = 4000
+
+
+async def send_long_message(message, text):
+
+    for i in range(0, len(text), MAX_MESSAGE_LENGTH):
+
+        chunk = text[i:i + MAX_MESSAGE_LENGTH]
+
+        await message.reply_text(chunk)
 
 
 async def match_type_handler(update: Update, context):
@@ -26,7 +34,6 @@ async def match_type_handler(update: Update, context):
             "Выбери лигу:",
             reply_markup=get_main_keyboard()
         )
-
         return
 
     if text in LEAGUES:
@@ -37,7 +44,6 @@ async def match_type_handler(update: Update, context):
             f"Лига выбрана: {text}",
             reply_markup=get_match_type_keyboard()
         )
-
         return
 
     if user_id not in user_league:
@@ -46,26 +52,23 @@ async def match_type_handler(update: Update, context):
             "Выбери лигу:",
             reply_markup=get_main_keyboard()
         )
-
         return
 
     league = user_league[user_id]
 
-    if text == "Недавние матчи":
+    if text == "Завершенные":
 
-        result = get_matches(league, "recent")
+        result = get_matches(league, "finished")
 
-        await update.message.reply_text(result)
+        await send_long_message(update.message, result)
 
         return
 
-    if text == "Выбери тур":
+    if text == "Предстоящие":
 
-        waiting_for_tour[user_id] = True
+        result = get_matches(league, "upcoming")
 
-        await update.message.reply_text(
-            "Введите номер тура:"
-        )
+        await send_long_message(update.message, result)
 
         return
 
@@ -73,6 +76,6 @@ async def match_type_handler(update: Update, context):
 
         result = get_matches(league, "live")
 
-        await update.message.reply_text(result)
+        await send_long_message(update.message, result)
 
         return
