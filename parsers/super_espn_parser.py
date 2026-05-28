@@ -1,4 +1,4 @@
-import requests
+ import requests
 from datetime import datetime, timedelta, timezone
 from collections import defaultdict
 import time
@@ -229,16 +229,10 @@ def group_matches(matches):
 
     result = ""
 
-    try:
-
-        sorted_dates = sorted(
-            grouped.keys(),
-            key=lambda x: datetime.strptime(x, "%d.%m.%Y")
-        )
-
-    except:
-
-        sorted_dates = grouped.keys()
+    sorted_dates = sorted(
+        grouped.keys(),
+        key=lambda x: datetime.strptime(x, "%d.%m.%Y")
+    )
 
     for date in sorted_dates:
 
