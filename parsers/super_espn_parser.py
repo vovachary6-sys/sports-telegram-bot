@@ -229,10 +229,16 @@ def group_matches(matches):
 
     result = ""
 
-    sorted_dates = sorted(
-        grouped.keys(),
-        key=lambda x: datetime.strptime(x, "%d.%m.%Y")
-    )
+    try:
+
+        sorted_dates = sorted(
+            grouped.keys(),
+            key=lambda x: datetime.strptime(x, "%d.%m.%Y")
+        )
+
+    except:
+
+        sorted_dates = grouped.keys()
 
     for date in sorted_dates:
 
