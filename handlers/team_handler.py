@@ -27,6 +27,6 @@ async def team_handler(update: Update, context):
 
     team_name = " ".join(context.args)
 
-    result = search_team(team_name)
+    result = search_team('test ok')
 
     await send_long_message(update.message, result)
