@@ -417,62 +417,74 @@ def search_team(team_name):
 
     for league in LEAGUES:
 
-        events, sport = load_events(league)
+        try:
 
-        for e in events:
+            events, sport = load_events(league)
 
-            comp = e["competitions"][0]
+            for e in events:
 
-            teams = comp["competitors"]
+                try:
 
-            team1 = teams[0]["team"]["displayName"]
-            team2 = teams[1]["team"]["displayName"]
+                    comp = e["competitions"][0]
 
-            if (
-                team_name not in team1.lower()
-                and team_name not in team2.lower()
-            ):
-                continue
+                    teams = comp["competitors"]
 
-            dt, utc, msk = convert_time(e["date"])
+                    team1 = teams[0]["team"]["displayName"]
+                    team2 = teams[1]["team"]["displayName"]
 
-            stadium = get_stadium(e)
+                    if (
+                        team_name not in team1.lower()
+                        and team_name not in team2.lower()
+                    ):
+                        continue
 
-            status = e["status"]["type"]["state"]
+                    dt, utc, msk = convert_time(e["date"])
 
-            date_label = dt.strftime("%d.%m.%Y")
+                    stadium = get_stadium(e)
 
-            if status == "post":
+                    status = e["status"]["type"]["state"]
 
-                score = f"{teams[0]['score']}:{teams[1]['score']}"
+                    date_label = dt.strftime("%d.%m.%Y")
 
-            elif status in ["in", "live"]:
+                    if status == "post":
 
-                score = (
-                    f"LIVE "
-                    f"{teams[0]['score']}:{teams[1]['score']}"
-                )
+                        score = (
+                            f"{teams[0]['score']}:{teams[1]['score']}"
+                        )
 
-            else:
+                    elif status in ["in", "live"]:
 
-                score = "vs"
+                        score = (
+                            f"LIVE "
+                            f"{teams[0]['score']}:{teams[1]['score']}"
+                        )
 
-            text = (
-                f"{team1} {score} {team2}\n"
-                f"🏟 {stadium}\n"
-                f"{utc} UTC | {msk} МСК\n"
-            )
+                    else:
 
-            text += get_goal_scorers(e, league)
+                        score = "vs"
 
-            text = add_match_link(e, text)
+                    text = (
+                        f"{team1} {score} {team2}\n"
+                        f"🏟 {stadium}\n"
+                        f"{utc} UTC | {msk} МСК\n"
+                    )
 
-            text += "\n"
+                    text += get_goal_scorers(e, league)
 
-            all_matches.append({
-                "date": date_label,
-                "text": text
-            })
+                    text = add_match_link(e, text)
+
+                    text += "\n"
+
+                    all_matches.append({
+                        "date": date_label,
+                        "text": text
+                    })
+
+                except:
+                    continue
+
+        except:
+            continue
 
     if not all_matches:
 
