@@ -1,11 +1,21 @@
-from telegram import Update
-
-from keyboards.leagues_keyboard import get_leagues_keyboard
+from telegram import ReplyKeyboardMarkup
 
 
-async def start(update: Update, context):
+def get_match_type_keyboard():
 
-    await update.message.reply_text(
-        "Выбери лигу:",
-        reply_markup=get_leagues_keyboard()
+    keyboard = [
+
+        ["Недавние матчи"],
+
+        ["Выбери тур"],
+
+        ["Live"],
+
+        ["Выбрать другую лигу"]
+
+    ]
+
+    return ReplyKeyboardMarkup(
+        keyboard,
+        resize_keyboard=True
     )
