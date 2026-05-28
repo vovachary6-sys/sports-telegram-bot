@@ -229,7 +229,12 @@ def group_matches(matches):
 
     result = ""
 
-    for date in sorted(grouped.keys()):
+    sorted_dates = sorted(
+        grouped.keys(),
+        key=lambda x: datetime.strptime(x, "%d.%m.%Y")
+    )
+
+    for date in sorted_dates:
 
         result += f"📅 {date}\n\n"
 
